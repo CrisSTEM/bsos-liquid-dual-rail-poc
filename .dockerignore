@@ -1,0 +1,14 @@
+node_modules
+.git
+.env
+.env.*
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+data/*.db-shm
+data/*.db-wal
+npm-debug.log*
+coverage
+tmp
+.temp
+.cache
