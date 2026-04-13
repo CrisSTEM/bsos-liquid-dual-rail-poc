@@ -1,25 +1,26 @@
-services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: bsos-liquid-dual-rail-poc
-    env_file:
-      - .env
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./data:/app/data:Z
-    restart: unless-stopped
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "fetch('http://127.0.0.1:3000/healthz').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
-        ]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
+services:  
+  app:  
+    container_name: bsos-liquid-dual-rail-poc  
+    build:  
+      context: .  
+      dockerfile: Dockerfile  
+    env_file:  
+      - .env  
+    environment:  
+      NODE_ENV: production  
+      PORT: 3000  
+      HOST: 0.0.0.0  
+    ports:  
+      - "3000:3000"  
+    volumes:  
+      - app_data:/app/data  
+    restart: unless-stopped  
+    healthcheck:  
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]  
+      interval: 10s  
+      timeout: 3s  
+      retries: 12  
+      start_period: 10s  
+  
+volumes:  
+  app_data:  
