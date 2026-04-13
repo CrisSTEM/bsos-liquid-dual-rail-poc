@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>BSOS Liquid Dual-Rail PoC</title>
+        <style>
+            body {
+                font-family: Inter, Arial, sans-serif;
+                max-width: 1100px;
+                margin: 0 auto;
+                padding: 32px;
+                background: #f8fafc;
+                color: #0f172a;
+            }
+            h1,
+            h2 {
+                margin-top: 0;
+            }
+            section {
+                background: white;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                padding: 20px;
+                margin-bottom: 24px;
+                box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+            }
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 16px;
+            }
+            label {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                font-size: 14px;
+            }
+            input,
+            button {
+                border-radius: 8px;
+                border: 1px solid #cbd5e1;
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+            button {
+                background: #0f172a;
+                color: white;
+                cursor: pointer;
+                border: none;
+            }
+            pre {
+                background: #0f172a;
+                color: #e2e8f0;
+                padding: 16px;
+                border-radius: 8px;
+                overflow: auto;
+                min-height: 120px;
+            }
+            .actions {
+                margin-top: 12px;
+                display: flex;
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>BSOS Liquid Dual-Rail PoC</h1>
+        <p>
+            Minimal proof of concept for IVMS 101 + confidential settlement on
+            Liquid Testnet.
+        </p>
+
+        <section>
+            <h2>1) Simulate transfer</h2>
+            <form id="transfer-form">
+                <div class="grid">
+                    <label>
+                        Originator name
+                        <input
+                            name="originator_name"
+                            value="ACME Brasil Ltda"
+                        />
+                    </label>
+                    <label>
+                        Originator document
+                        <input
+                            name="originator_document"
+                            value="12.345.678/0001-99"
+                        />
+                    </label>
+                    <label>
+                        Originator VASP ID
+                        <input name="originator_vasp" value="BSOS_BR" />
+                    </label>
+                    <label>
+                        Beneficiary name
+                        <input
+                            name="beneficiary_name"
+                            value="Taipei Supplier Co"
+                        />
+                    </label>
+                    <label>
+                        Beneficiary wallet
+                        <input
+                            name="beneficiary_wallet"
+                            value="tlq1qqexamplebeneficiarywallet000000000000"
+                        />
+                    </label>
+                    <label>
+                        Beneficiary VASP ID
+                        <input name="beneficiary_vasp" value="ASIA_PARTNER" />
+                    </label>
+                    <label>
+                        Amount
+                        <input name="amount" value="1250.75" />
+                    </label>
+                    <label>
+                        Currency
+                        <input name="currency" value="USD" />
+                    </label>
+                    <label>
+                        Asset symbol
+                        <input name="asset_symbol" value="L-USDt" />
+                    </label>
+                    <label>
+                        Purpose
+                        <input name="purpose" value="Invoice INV-2026-0001" />
+                    </label>
+                </div>
+                <div class="actions">
+                    <button type="submit">Submit /api/transfer</button>
+                </div>
+            </form>
+            <pre id="transfer-output">Waiting for response...</pre>
+        </section>
+
+        <section>
+            <h2>2) Query Liquid Testnet transaction</h2>
+            <div class="grid">
+                <label>
+                    TxID
+                    <input id="lookup-txid" placeholder="Paste the txid here" />
+                </label>
+            </div>
+            <div class="actions">
+                <button id="lookup-button">Call /api/liquid/tx/:txid</button>
+            </div>
+            <pre id="lookup-output">Waiting for lookup...</pre>
+        </section>
+
+        <section>
+            <h2>3) Regulator audit</h2>
+            <form id="audit-form">
+                <div class="grid">
+                    <label>
+                        TxID
+                        <input id="audit-txid" name="txid" placeholder="TxID" />
+                    </label>
+                    <label>
+                        Blinding key
+                        <input
+                            id="audit-blinding-key"
+                            name="blinding_key"
+                            placeholder="Blinding key"
+                        />
+                    </label>
+                    <label>
+                        Requester
+                        <input name="requester" value="BCB_DEMO" />
+                    </label>
+                </div>
+                <div class="actions">
+                    <button type="submit">Submit /api/audit</button>
+                </div>
+            </form>
+            <pre id="audit-output">Waiting for audit response...</pre>
+        </section>
+
+        <script>
+            async function readJson(response) {
+                const text = await response.text();
+                try {
+                    return JSON.parse(text);
+                } catch {
+                    return { raw: text };
+                }
+            }
+
+            async function api(url, options = {}) {
+                const response = await fetch(url, {
+                    headers: { "Content-Type": "application/json" },
+                    ...options,
+                });
+
+                const data = await readJson(response);
+
+                if (!response.ok) {
+                    throw new Error(JSON.stringify(data, null, 2));
+                }
+
+                return data;
+            }
+
+            function print(id, data) {
+                document.getElementById(id).textContent = JSON.stringify(
+                    data,
+                    null,
+                    2,
+                );
+            }
+
+            document
+                .getElementById("transfer-form")
+                .addEventListener("submit", async (event) => {
+                    event.preventDefault();
+
+                    const form = new FormData(event.target);
+
+                    const payload = {
+                        originator: {
+                            name: form.get("originator_name"),
+                            documentNumber: form.get("originator_document"),
+                            vaspId: form.get("originator_vasp"),
+                            country: "BR",
+                        },
+                        beneficiary: {
+                            name: form.get("beneficiary_name"),
+                            walletAddress: form.get("beneficiary_wallet"),
+                            vaspId: form.get("beneficiary_vasp"),
+                            country: "TW",
+                        },
+                        transfer: {
+                            amount: form.get("amount"),
+                            currency: form.get("currency"),
+                            assetSymbol: form.get("asset_symbol"),
+                            purpose: form.get("purpose"),
+                        },
+                    };
+
+                    try {
+                        const data = await api("/api/transfer", {
+                            method: "POST",
+                            body: JSON.stringify(payload),
+                        });
+
+                        print("transfer-output", data);
+
+                        document.getElementById("lookup-txid").value =
+                            data.txid || "";
+                        document.getElementById("audit-txid").value =
+                            data.txid || "";
+                        document.getElementById("audit-blinding-key").value =
+                            data?.regulator_demo?.blinding_key || "";
+                    } catch (error) {
+                        print("transfer-output", { error: error.message });
+                    }
+                });
+
+            document
+                .getElementById("lookup-button")
+                .addEventListener("click", async () => {
+                    const txid = document
+                        .getElementById("lookup-txid")
+                        .value.trim();
+
+                    if (!txid) {
+                        print("lookup-output", {
+                            error: "A txid is required.",
+                        });
+                        return;
+                    }
+
+                    try {
+                        const data = await api(
+                            `/api/liquid/tx/${encodeURIComponent(txid)}`,
+                        );
+                        print("lookup-output", data);
+                    } catch (error) {
+                        print("lookup-output", { error: error.message });
+                    }
+                });
+
+            document
+                .getElementById("audit-form")
+                .addEventListener("submit", async (event) => {
+                    event.preventDefault();
+
+                    const form = new FormData(event.target);
+
+                    const payload = {
+                        txid: form.get("txid"),
+                        blinding_key: form.get("blinding_key"),
+                        requester: form.get("requester"),
+                    };
+
+                    try {
+                        const data = await api("/api/audit", {
+                            method: "POST",
+                            body: JSON.stringify(payload),
+                        });
+
+                        print("audit-output", data);
+                    } catch (error) {
+                        print("audit-output", { error: error.message });
+                    }
+                });
+        </script>
+    </body>
+</html>
