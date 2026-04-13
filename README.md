@@ -35,7 +35,7 @@ Receives a `txid` and a `blinding_key`, validates the off-chain audit artifact, 
   
 ## Requirements  
   
-- Node.js 20+  
+- Node.js 22+  
 - npm  
 - SQLite  
 - Docker (optional)  
