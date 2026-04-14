@@ -1,0 +1,65 @@
+body[data-presenter="on"] .presenter-hide {
+    display: none !important;
+}
+
+body[data-presenter="on"] .shell {
+    max-width: 1180px;
+}
+
+body[data-presenter="on"] .topbar,
+body[data-presenter="on"] .hero-panel,
+body[data-presenter="on"] .session-panel,
+body[data-presenter="on"] .card,
+body[data-presenter="on"] .step-panel,
+body[data-presenter="on"] .form-card {
+    padding: 20px;
+}
+
+body[data-presenter="on"] .topbar {
+    gap: 16px;
+}
+
+body[data-presenter="on"] .topbar-actions {
+    min-width: 0;
+    width: 100%;
+    align-items: flex-start;
+}
+
+body[data-presenter="on"] .pill-row,
+body[data-presenter="on"] .button-row {
+    justify-content: flex-start;
+}
+
+body[data-presenter="on"] .hero-panel,
+body[data-presenter="on"] .demo-layout,
+body[data-presenter="on"] .ops-layout {
+    grid-template-columns: 1fr;
+}
+
+body[data-presenter="on"] .session-grid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+body[data-presenter="on"] .result-box {
+    margin-top: 14px;
+}
+
+body[data-presenter="on"] .hero-title {
+    font-size: 30px;
+}
+
+body[data-presenter="on"] .panel-copy,
+body[data-presenter="on"] .step-copy,
+body[data-presenter="on"] .hero-copy {
+    max-width: none;
+}
+
+@media (max-width: 860px) {
+    body[data-presenter="on"] .session-grid {
+        grid-template-columns: 1fr;
+    }
+
+    body[data-presenter="on"] .progress-steps {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,293 @@
+.shell {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.topbar {
+    padding: 24px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.brand-wrap {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    min-width: 0;
+}
+
+.topbar-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: flex-end;
+    min-width: 420px;
+}
+
+.pill-row,
+.button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.hero-panel {
+    margin-top: 20px;
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 24px;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.session-panel {
+    margin-top: 20px;
+    padding: 24px;
+}
+
+.panel-header {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.panel-header-tight {
+    margin-bottom: 0;
+}
+
+.session-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.view-page {
+    margin-top: 20px;
+}
+
+.card {
+    padding: 24px;
+}
+
+.progress-card {
+    display: grid;
+    gap: 16px;
+}
+
+.progress-header {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.progress-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.demo-layout,
+.ops-layout {
+    display: grid;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.demo-layout {
+    grid-template-columns: 1.25fr 0.75fr;
+}
+
+.ops-layout {
+    grid-template-columns: 1.15fr 0.85fr;
+}
+
+.step-stack,
+.sidebar-stack {
+    display: grid;
+    gap: 20px;
+}
+
+.step-panel {
+    padding: 24px;
+}
+
+.step-head {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.fact-grid {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.inline-actions {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.form-stack {
+    display: grid;
+    gap: 20px;
+}
+
+.form-card {
+    padding: 24px;
+}
+
+.form-columns {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.field-grid {
+    display: grid;
+    gap: 14px;
+}
+
+.field-row {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.transfer-details-row {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.response-tabs {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.checklist {
+    margin-top: 18px;
+    display: grid;
+    gap: 12px;
+}
+
+.section-spaced {
+    margin-top: 20px;
+}
+
+.section-title-tight {
+    margin-top: 8px;
+}
+
+.response-title-space {
+    margin-top: 18px;
+}
+
+.footer-note {
+    margin-top: 20px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    padding-bottom: 8px;
+}
+
+.toast-container {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1000;
+    display: grid;
+    gap: 10px;
+    width: min(380px, calc(100vw - 40px));
+}
+
+@media (max-width: 1180px) {
+    .hero-panel,
+    .demo-layout,
+    .ops-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .topbar {
+        flex-direction: column;
+    }
+
+    .topbar-actions {
+        min-width: 0;
+        width: 100%;
+        align-items: flex-start;
+    }
+
+    .pill-row,
+    .button-row {
+        justify-content: flex-start;
+    }
+
+    .session-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 860px) {
+    .shell {
+        padding: 16px;
+    }
+
+    .session-grid,
+    .form-columns,
+    .fact-grid,
+    .field-row,
+    .progress-steps,
+    .stat-grid,
+    .transfer-details-row {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-header,
+    .progress-header,
+    .step-head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .button-row,
+    .inline-actions {
+        width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .brand-wrap {
+        flex-direction: column;
+    }
+
+    .view-switch {
+        width: 100%;
+    }
+
+    .view-button {
+        flex: 1 1 0;
+        text-align: center;
+    }
+
+    .button,
+    .button.small {
+        width: 100%;
+    }
+}
