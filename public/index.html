@@ -3,1079 +3,1722 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>BSOS Dual-Rail Compliance Workspace</title>
+        <title>BSOS Dual-Rail PoC</title>
 
-        <link rel="stylesheet" href="/assets/css/tokens.css" />
-        <link rel="stylesheet" href="/assets/css/base.css" />
-        <link rel="stylesheet" href="/assets/css/layout.css" />
-        <link rel="stylesheet" href="/assets/css/components.css" />
-        <link rel="stylesheet" href="/assets/css/presenter.css" />
+        <style>
+            :root {
+                --bg: #f5f7fb;
+                --panel: #ffffff;
+                --panel-soft: #f8fafc;
+                --text: #0f172a;
+                --muted: #475467;
+                --line: #e4e7ec;
+                --blue: #2563eb;
+                --blue-strong: #1d4ed8;
+                --green: #027a48;
+                --green-bg: #ecfdf3;
+                --green-line: #abefc6;
+                --amber: #b54708;
+                --amber-bg: #fffaeb;
+                --amber-line: #fedf89;
+                --red: #b42318;
+                --red-bg: #fef3f2;
+                --red-line: #fecdca;
+                --shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
+                --radius: 18px;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                overflow: hidden;
+                background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+                color: var(--text);
+                font-family:
+                    Inter,
+                    ui-sans-serif,
+                    system-ui,
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    "Segoe UI",
+                    sans-serif;
+            }
+
+            button,
+            input,
+            textarea {
+                font: inherit;
+            }
+
+            button {
+                cursor: pointer;
+            }
+
+            .mono {
+                font-family:
+                    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+                    "Liberation Mono", "Courier New", monospace;
+            }
+
+            .app {
+                height: 100dvh;
+                display: grid;
+                grid-template-rows: auto auto 1fr auto;
+                gap: 14px;
+                padding: 18px;
+            }
+
+            .topbar {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                background: rgba(255, 255, 255, 0.94);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                box-shadow: var(--shadow);
+                padding: 14px 16px;
+            }
+
+            .brand {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                min-width: 0;
+            }
+
+            .brand-mark {
+                width: 42px;
+                height: 42px;
+                flex: 0 0 42px;
+                border-radius: 12px;
+                display: grid;
+                place-items: center;
+                background: linear-gradient(
+                    135deg,
+                    var(--blue) 0%,
+                    #4f46e5 100%
+                );
+                color: white;
+                font-weight: 800;
+                letter-spacing: 0.04em;
+            }
+
+            .brand-copy {
+                min-width: 0;
+            }
+
+            .eyebrow {
+                margin: 0 0 4px 0;
+                color: var(--muted);
+                font-size: 0.72rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+            }
+
+            .title {
+                margin: 0;
+                font-size: 1.28rem;
+                line-height: 1.1;
+                font-weight: 800;
+                color: var(--text);
+            }
+
+            .subtitle {
+                margin: 4px 0 0 0;
+                font-size: 0.92rem;
+                color: var(--muted);
+            }
+
+            .top-actions {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+
+            .badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                min-height: 34px;
+                padding: 0 12px;
+                border-radius: 999px;
+                border: 1px solid transparent;
+                font-size: 0.84rem;
+                font-weight: 800;
+                white-space: nowrap;
+            }
+
+            .badge-warning {
+                background: var(--amber-bg);
+                color: var(--amber);
+                border-color: var(--amber-line);
+            }
+
+            .badge-success {
+                background: var(--green-bg);
+                color: var(--green);
+                border-color: var(--green-line);
+            }
+
+            .badge-error {
+                background: var(--red-bg);
+                color: var(--red);
+                border-color: var(--red-line);
+            }
+
+            .btn {
+                min-height: 38px;
+                border-radius: 12px;
+                border: 1px solid transparent;
+                padding: 0 14px;
+                font-weight: 800;
+                transition:
+                    transform 0.12s ease,
+                    background-color 0.12s ease,
+                    border-color 0.12s ease,
+                    opacity 0.12s ease;
+            }
+
+            .btn:hover {
+                transform: translateY(-1px);
+            }
+
+            .btn:disabled {
+                opacity: 0.65;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            .btn-primary {
+                background: var(--blue);
+                color: white;
+                border-color: var(--blue);
+                box-shadow: 0 10px 22px rgba(37, 99, 235, 0.2);
+            }
+
+            .btn-primary:hover {
+                background: var(--blue-strong);
+                border-color: var(--blue-strong);
+            }
+
+            .btn-secondary {
+                background: white;
+                color: var(--text);
+                border-color: #d0d5dd;
+            }
+
+            .btn-secondary:hover {
+                background: #f8fafc;
+            }
+
+            .btn-ghost {
+                background: transparent;
+                color: var(--muted);
+                border-color: #d0d5dd;
+            }
+
+            .btn-ghost:hover {
+                background: #f8fafc;
+                color: var(--text);
+            }
+
+            .progress {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .progress-step {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                min-height: 58px;
+                padding: 12px 14px;
+                background: rgba(255, 255, 255, 0.9);
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                box-shadow: var(--shadow);
+            }
+
+            .progress-index {
+                width: 28px;
+                height: 28px;
+                flex: 0 0 28px;
+                display: grid;
+                place-items: center;
+                border-radius: 999px;
+                background: #e5e7eb;
+                color: #344054;
+                font-size: 0.82rem;
+                font-weight: 900;
+            }
+
+            .progress-name {
+                font-size: 0.93rem;
+                font-weight: 800;
+                color: #344054;
+                line-height: 1.2;
+            }
+
+            .progress-step.active {
+                border-color: #bfdbfe;
+                background: #eff6ff;
+            }
+
+            .progress-step.active .progress-index {
+                background: var(--blue);
+                color: white;
+            }
+
+            .progress-step.active .progress-name {
+                color: var(--text);
+            }
+
+            .progress-step.complete {
+                border-color: var(--green-line);
+                background: var(--green-bg);
+            }
+
+            .progress-step.complete .progress-index {
+                background: var(--green);
+                color: white;
+            }
+
+            .progress-step.complete .progress-name {
+                color: var(--green);
+            }
+
+            .frame {
+                min-height: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .screen {
+                display: none;
+                width: min(860px, 100%);
+                max-height: 100%;
+                overflow: auto;
+                background: rgba(255, 255, 255, 0.96);
+                border: 1px solid var(--line);
+                border-radius: 24px;
+                box-shadow: var(--shadow);
+                padding: 30px;
+            }
+
+            .screen.visible {
+                display: block;
+            }
+
+            .screen-kicker {
+                margin: 0 0 10px 0;
+                color: var(--muted);
+                font-size: 0.76rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+            }
+
+            .screen-title {
+                margin: 0;
+                font-size: 2rem;
+                line-height: 1.06;
+                font-weight: 900;
+                color: var(--text);
+            }
+
+            .screen-copy {
+                margin: 12px 0 0 0;
+                color: var(--muted);
+                font-size: 1rem;
+                line-height: 1.55;
+                max-width: 62ch;
+            }
+
+            .intro-points {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 12px;
+                margin-top: 22px;
+            }
+
+            .intro-point {
+                background: var(--panel-soft);
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                padding: 14px;
+            }
+
+            .intro-point strong {
+                display: block;
+                margin-bottom: 6px;
+                font-size: 0.9rem;
+            }
+
+            .intro-point p {
+                margin: 0;
+                font-size: 0.9rem;
+                color: var(--muted);
+                line-height: 1.45;
+            }
+
+            .note {
+                margin-top: 18px;
+                background: #f8fafc;
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                padding: 14px 16px;
+                color: var(--muted);
+                font-size: 0.94rem;
+                line-height: 1.5;
+            }
+
+            .note strong {
+                color: var(--text);
+            }
+
+            .screen-actions {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+                margin-top: 24px;
+            }
+
+            .step-meta {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                min-height: 30px;
+                padding: 0 10px;
+                border-radius: 999px;
+                background: #eff6ff;
+                color: var(--blue);
+                border: 1px solid #bfdbfe;
+                font-size: 0.8rem;
+                font-weight: 800;
+                margin-bottom: 14px;
+            }
+
+            .mini-grid {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+                margin-top: 22px;
+            }
+
+            .mini-card {
+                background: var(--panel-soft);
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                padding: 14px;
+            }
+
+            .mini-label {
+                margin: 0 0 6px 0;
+                font-size: 0.78rem;
+                font-weight: 800;
+                color: var(--muted);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .mini-value {
+                margin: 0;
+                font-size: 1rem;
+                line-height: 1.4;
+                font-weight: 800;
+                color: var(--text);
+                word-break: break-word;
+            }
+
+            .focus-block {
+                margin-top: 20px;
+                padding: 16px;
+                background: var(--panel-soft);
+                border: 1px solid var(--line);
+                border-radius: 16px;
+            }
+
+            .focus-label {
+                display: block;
+                margin-bottom: 8px;
+                font-size: 0.78rem;
+                font-weight: 800;
+                color: var(--muted);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .focus-value {
+                font-size: 1rem;
+                font-weight: 800;
+                line-height: 1.45;
+                color: var(--text);
+                word-break: break-word;
+            }
+
+            .status-line {
+                margin: 18px 0 0 0;
+                padding: 12px 14px;
+                border-radius: 14px;
+                border: 1px solid #dbeafe;
+                background: #f8fbff;
+                color: var(--text);
+                font-size: 0.95rem;
+                line-height: 1.5;
+            }
+
+            .status-line.success {
+                background: var(--green-bg);
+                border-color: var(--green-line);
+                color: var(--green);
+            }
+
+            .status-line.error {
+                background: var(--red-bg);
+                border-color: var(--red-line);
+                color: var(--red);
+            }
+
+            .final-grid {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+                margin-top: 22px;
+            }
+
+            .final-card {
+                background: var(--panel-soft);
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                padding: 14px;
+            }
+
+            .final-label {
+                margin: 0 0 6px 0;
+                color: var(--muted);
+                font-size: 0.78rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .final-value {
+                margin: 0;
+                font-size: 1rem;
+                line-height: 1.45;
+                font-weight: 800;
+                color: var(--text);
+                word-break: break-word;
+            }
+
+            .final-proof {
+                display: grid;
+                gap: 10px;
+                margin-top: 20px;
+            }
+
+            .final-proof-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 12px 14px;
+                border-radius: 14px;
+                background: #f8fafc;
+                border: 1px solid var(--line);
+                color: var(--muted);
+                line-height: 1.5;
+                font-size: 0.94rem;
+            }
+
+            .final-proof-number {
+                width: 24px;
+                height: 24px;
+                flex: 0 0 24px;
+                border-radius: 999px;
+                display: grid;
+                place-items: center;
+                background: var(--blue);
+                color: white;
+                font-size: 0.78rem;
+                font-weight: 900;
+                margin-top: 1px;
+            }
+
+            .proofbar {
+                display: grid;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 10px;
+                background: rgba(255, 255, 255, 0.96);
+                border: 1px solid var(--line);
+                border-radius: 18px;
+                box-shadow: var(--shadow);
+                padding: 10px;
+            }
+
+            .proofbar[hidden] {
+                display: none;
+            }
+
+            .proof-item {
+                min-width: 0;
+                background: #f8fafc;
+                border: 1px solid var(--line);
+                border-radius: 14px;
+                padding: 10px 12px;
+            }
+
+            .proof-item span {
+                display: block;
+                margin-bottom: 4px;
+                color: var(--muted);
+                font-size: 0.75rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+            }
+
+            .proof-item strong {
+                display: block;
+                color: var(--text);
+                font-size: 0.92rem;
+                line-height: 1.35;
+                font-weight: 800;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .drawer-backdrop {
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.35);
+                z-index: 20;
+            }
+
+            .drawer-backdrop[hidden] {
+                display: none;
+            }
+
+            .drawer {
+                position: fixed;
+                top: 18px;
+                right: 18px;
+                bottom: 18px;
+                width: min(480px, calc(100vw - 36px));
+                background: #ffffff;
+                border: 1px solid var(--line);
+                border-radius: 22px;
+                box-shadow: 0 28px 60px rgba(15, 23, 42, 0.18);
+                z-index: 30;
+                display: grid;
+                grid-template-rows: auto 1fr;
+                overflow: hidden;
+            }
+
+            .drawer[hidden] {
+                display: none;
+            }
+
+            .drawer-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                padding: 16px 18px;
+                border-bottom: 1px solid var(--line);
+                background: #fcfcfd;
+            }
+
+            .drawer-title {
+                margin: 0;
+                font-size: 1rem;
+                font-weight: 900;
+                color: var(--text);
+            }
+
+            .drawer-copy {
+                margin: 4px 0 0 0;
+                color: var(--muted);
+                font-size: 0.88rem;
+                line-height: 1.45;
+            }
+
+            .drawer-body {
+                overflow: auto;
+                padding: 16px;
+                display: grid;
+                gap: 12px;
+                background: #f8fafc;
+            }
+
+            .drawer-card {
+                background: white;
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                overflow: hidden;
+            }
+
+            .drawer-card-head {
+                padding: 12px 14px;
+                border-bottom: 1px solid var(--line);
+                background: #fcfcfd;
+            }
+
+            .drawer-card-head h3 {
+                margin: 0;
+                font-size: 0.92rem;
+                font-weight: 900;
+                color: var(--text);
+            }
+
+            .drawer-card pre {
+                margin: 0;
+                padding: 14px;
+                background: #0f172a;
+                color: #e2e8f0;
+                font-size: 0.82rem;
+                line-height: 1.55;
+                overflow: auto;
+                max-height: 220px;
+            }
+
+            .toast-host {
+                position: fixed;
+                right: 18px;
+                bottom: 18px;
+                z-index: 40;
+                display: grid;
+                gap: 8px;
+            }
+
+            .toast {
+                min-width: 240px;
+                max-width: 360px;
+                padding: 12px 14px;
+                border-radius: 14px;
+                border: 1px solid var(--line);
+                background: white;
+                color: var(--text);
+                box-shadow: var(--shadow);
+                font-size: 0.92rem;
+                line-height: 1.45;
+            }
+
+            .toast.success {
+                border-color: var(--green-line);
+                background: var(--green-bg);
+                color: var(--green);
+            }
+
+            .toast.error {
+                border-color: var(--red-line);
+                background: var(--red-bg);
+                color: var(--red);
+            }
+
+            @media (max-width: 980px) {
+                html,
+                body {
+                    overflow: auto;
+                }
+
+                .app {
+                    height: auto;
+                    min-height: 100dvh;
+                    grid-template-rows: auto auto auto auto;
+                }
+
+                .topbar {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .top-actions {
+                    width: 100%;
+                    justify-content: flex-start;
+                }
+
+                .progress,
+                .intro-points,
+                .mini-grid,
+                .final-grid,
+                .proofbar {
+                    grid-template-columns: 1fr;
+                }
+
+                .frame {
+                    align-items: stretch;
+                }
+            }
+        </style>
     </head>
-    <body data-presenter="off">
-        <div class="shell">
+    <body>
+        <div class="app">
             <header class="topbar">
-                <div class="brand-wrap">
+                <div class="brand">
                     <div class="brand-mark">BS</div>
 
-                    <div>
+                    <div class="brand-copy">
                         <p class="eyebrow">
                             BSOS · Liquid Testnet · Travel Rule
                         </p>
-                        <h1 class="brand-title">
-                            Dual-Rail Compliance Workspace
-                        </h1>
-                        <p class="brand-copy presenter-hide">
-                            Use Demo view for the narrated walkthrough and
-                            Operations view for direct control over the working
-                            payloads and raw responses.
+                        <h1 class="title">BSOS Dual-Rail PoC</h1>
+                        <p class="subtitle">
+                            Recording-first walkthrough for the three-step demo.
                         </p>
                     </div>
                 </div>
 
-                <div class="topbar-actions">
-                    <div class="pill-row">
-                        <span id="healthPill" class="pill warning"
-                            >Checking API</span
-                        >
-                        <span class="pill neutral">Liquid Testnet</span>
-                        <span class="pill neutral presenter-hide"
-                            >IVMS101 Off-Chain</span
-                        >
-                        <span class="pill neutral presenter-hide"
-                            >Audit Disclosure</span
-                        >
+                <div class="top-actions">
+                    <div
+                        id="healthBadge"
+                        class="badge badge-warning"
+                        title="Checking backend health"
+                    >
+                        Checking API…
                     </div>
 
-                    <div class="view-switch">
-                        <button
-                            type="button"
-                            class="view-button active"
-                            data-view-button="demo"
-                        >
-                            Demo view
-                        </button>
-                        <button
-                            type="button"
-                            class="view-button"
-                            data-view-button="ops"
-                        >
-                            Operations view
-                        </button>
-                    </div>
+                    <button
+                        id="refreshHealthBtn"
+                        type="button"
+                        class="btn btn-ghost"
+                    >
+                        Check API
+                    </button>
 
-                    <div class="button-row">
-                        <button
-                            id="loadDefaultsBtn"
-                            type="button"
-                            class="button secondary"
-                        >
-                            Load demo defaults
-                        </button>
-                        <button
-                            id="refreshHealthBtn"
-                            type="button"
-                            class="button secondary"
-                        >
-                            Refresh health
-                        </button>
-                        <button
-                            id="resetSessionBtn"
-                            type="button"
-                            class="button secondary"
-                        >
-                            Reset session
-                        </button>
-                        <button
-                            id="togglePresenterBtn"
-                            type="button"
-                            class="button secondary"
-                        >
-                            Presenter mode off
-                        </button>
-                    </div>
+                    <button
+                        id="restartBtn"
+                        type="button"
+                        class="btn btn-ghost"
+                        hidden
+                    >
+                        Restart
+                    </button>
+
+                    <button
+                        id="toggleDetailsBtn"
+                        type="button"
+                        class="btn btn-secondary"
+                    >
+                        Technical details
+                    </button>
                 </div>
             </header>
 
-            <section class="hero-panel">
-                <div>
-                    <p class="eyebrow">Presentation-ready UI</p>
-                    <h2 class="hero-title">
-                        Show the PoC in three steps, then switch to operator
-                        controls only if needed.
+            <section class="progress" aria-label="Demo progress">
+                <div id="chip1" class="progress-step active">
+                    <div class="progress-index">1</div>
+                    <div class="progress-name">Create transfer</div>
+                </div>
+
+                <div id="chip2" class="progress-step">
+                    <div class="progress-index">2</div>
+                    <div class="progress-name">Inspect confidentiality</div>
+                </div>
+
+                <div id="chip3" class="progress-step">
+                    <div class="progress-index">3</div>
+                    <div class="progress-name">Run audit</div>
+                </div>
+            </section>
+
+            <main class="frame">
+                <section id="screenIntro" class="screen visible">
+                    <p class="screen-kicker">Ready to record</p>
+                    <h2 class="screen-title">
+                        One screen, three actions, one final proof.
                     </h2>
-                    <p class="hero-copy">
-                        Step 1 stores IVMS101 off-chain, step 2 proves the
-                        linked Liquid transaction is confidential, and step 3
-                        simulates regulator disclosure using the txid plus the
-                        demo blinding key.
+                    <p class="screen-copy">
+                        This view is intentionally compact. Only the current
+                        step stays on screen, so the recording remains focused
+                        and easy to follow.
                     </p>
 
-                    <div class="hero-note presenter-hide">
-                        <strong>Why this works for the demo:</strong> the guided
-                        flow stays simple on screen, while the Operations view
-                        still gives you access to raw JSON, manual txid
-                        overrides, and explicit audit inputs when you need to go
-                        deeper.
-                    </div>
-                </div>
+                    <div class="intro-points">
+                        <div class="intro-point">
+                            <strong>Step 1</strong>
+                            <p>
+                                Store an IVMS101-style payload off-chain and
+                                bind it to a settlement reference.
+                            </p>
+                        </div>
 
-                <div class="stat-grid">
-                    <article class="stat-card">
-                        <p class="stat-label">Service health</p>
-                        <p id="heroServiceValue" class="stat-value">
-                            Checking…
-                        </p>
-                        <p id="heroServiceMeta" class="stat-meta">
-                            Backend reachability and Esplora status.
-                        </p>
-                    </article>
+                        <div class="intro-point">
+                            <strong>Step 2</strong>
+                            <p>
+                                Fetch the linked Liquid transaction and confirm
+                                it contains blinded outputs.
+                            </p>
+                        </div>
 
-                    <article class="stat-card">
-                        <p class="stat-label">Latest settlement</p>
-                        <p id="heroSettlementValue" class="stat-value">
-                            No transfer yet
-                        </p>
-                        <p id="heroSettlementMeta" class="stat-meta">
-                            A settlement reference appears after step 1.
-                        </p>
-                    </article>
-
-                    <article class="stat-card">
-                        <p class="stat-label">Confidentiality</p>
-                        <p id="heroConfValue" class="stat-value">Pending</p>
-                        <p id="heroConfMeta" class="stat-meta">
-                            Step 2 confirms blinded outputs on-chain.
-                        </p>
-                    </article>
-
-                    <article class="stat-card">
-                        <p class="stat-label">Audit result</p>
-                        <p id="heroAuditValue" class="stat-value">
-                            Not run yet
-                        </p>
-                        <p id="heroAuditMeta" class="stat-meta">
-                            Step 3 simulates case-specific disclosure.
-                        </p>
-                    </article>
-                </div>
-            </section>
-
-            <section class="session-panel">
-                <div class="panel-header">
-                    <div>
-                        <p class="eyebrow">Current session</p>
-                        <h2 class="panel-title">
-                            Shared context across both views
-                        </h2>
-                        <p class="panel-copy">
-                            The latest successful session state is summarized
-                            here and stays visible no matter which view is
-                            active.
-                        </p>
+                        <div class="intro-point">
+                            <strong>Step 3</strong>
+                            <p>
+                                Validate the audit path using the txid plus demo
+                                disclosure material.
+                            </p>
+                        </div>
                     </div>
 
-                    <div class="button-row presenter-hide">
-                        <button
-                            id="copyTxidBtn"
-                            type="button"
-                            class="button subtle small"
+                    <div class="note">
+                        <strong>Demo note:</strong> this frontend uses a
+                        <strong
+                            >real confirmed Liquid Testnet transaction</strong
                         >
-                            Copy txid
-                        </button>
+                        configured in <span class="mono">.env</span> as the
+                        settlement anchor. It does not broadcast a new
+                        transaction during the recording.
+                    </div>
+
+                    <div class="screen-actions">
                         <button
-                            id="copyBlindingKeyBtn"
+                            id="introStartBtn"
                             type="button"
-                            class="button subtle small"
+                            class="btn btn-primary"
                         >
-                            Copy blinding key
+                            Load sample and start demo
                         </button>
                     </div>
-                </div>
+                </section>
 
-                <div class="session-grid">
-                    <article class="session-card">
-                        <p class="session-label">Settlement reference</p>
-                        <p id="sessionSettlement" class="session-value">—</p>
-                    </article>
+                <section id="screenStep1" class="screen">
+                    <div class="step-meta">Step 1 of 3</div>
+                    <h2 class="screen-title">Create transfer</h2>
+                    <p class="screen-copy">
+                        Store the Travel Rule payload off-chain and create the
+                        settlement reference for the demo session.
+                    </p>
 
-                    <article class="session-card">
-                        <p class="session-label">Travel Rule status</p>
-                        <p id="sessionTravelRule" class="session-value">—</p>
-                    </article>
-
-                    <article class="session-card">
-                        <p class="session-label">Amount / asset</p>
-                        <p id="sessionAmount" class="session-value">—</p>
-                    </article>
-
-                    <article class="session-card">
-                        <p class="session-label">Transaction ID</p>
-                        <p id="sessionTxid" class="session-value mono">—</p>
-                    </article>
-
-                    <article class="session-card">
-                        <p class="session-label">Blinding key</p>
-                        <p id="sessionBlindingKey" class="session-value mono">
-                            —
-                        </p>
-                    </article>
-
-                    <article class="session-card">
-                        <p class="session-label">Audit result</p>
-                        <p id="sessionAudit" class="session-value">—</p>
-                    </article>
-                </div>
-            </section>
-
-            <section id="demoView" class="view-page">
-                <div class="card progress-card">
-                    <div class="progress-header">
-                        <div>
-                            <p class="eyebrow">Demo walkthrough</p>
-                            <h2 class="panel-title">Three-step PoC flow</h2>
+                    <div class="mini-grid">
+                        <div class="mini-card">
+                            <p class="mini-label">Originator</p>
+                            <p id="step1Originator" class="mini-value">—</p>
                         </div>
 
-                        <div class="progress-meta" id="demoProgressLabel">
-                            0 of 3 steps completed
+                        <div class="mini-card">
+                            <p class="mini-label">Beneficiary</p>
+                            <p id="step1Beneficiary" class="mini-value">—</p>
+                        </div>
+
+                        <div class="mini-card">
+                            <p class="mini-label">Amount</p>
+                            <p id="step1Amount" class="mini-value">—</p>
+                        </div>
+
+                        <div class="mini-card">
+                            <p class="mini-label">Asset</p>
+                            <p id="step1Asset" class="mini-value">—</p>
                         </div>
                     </div>
 
-                    <div class="progress-track">
-                        <div id="demoProgressBar" class="progress-bar"></div>
+                    <div class="note">
+                        The payload is stored off-chain. The blockchain anchor
+                        used in the demo is the preconfigured real Liquid
+                        Testnet tx.
                     </div>
 
-                    <div class="progress-steps">
-                        <div id="progressNode1" class="progress-node active">
-                            <div class="progress-index">1</div>
-                            <p class="progress-name">Create transfer</p>
-                            <p class="progress-copy">
-                                Store IVMS101 off-chain and link a settlement
-                                reference to a Liquid txid.
-                            </p>
+                    <div class="screen-actions">
+                        <button
+                            id="runStep1Btn"
+                            type="button"
+                            class="btn btn-primary"
+                        >
+                            Run step 1
+                        </button>
+                    </div>
+
+                    <p id="step1Status" class="status-line" aria-live="polite">
+                        Ready to create the transfer.
+                    </p>
+                </section>
+
+                <section id="screenStep2" class="screen">
+                    <div class="step-meta">Step 2 of 3</div>
+                    <h2 class="screen-title">Inspect confidentiality</h2>
+                    <p class="screen-copy">
+                        Fetch the linked Liquid transaction and confirm that the
+                        settlement rail is confidential on-chain.
+                    </p>
+
+                    <div class="focus-block">
+                        <span class="focus-label">Linked txid</span>
+                        <span id="step2Txid" class="focus-value mono">—</span>
+                    </div>
+
+                    <div class="note">
+                        This proves the public chain exposes confidential
+                        commitments, not the clear amount and asset directly.
+                    </div>
+
+                    <div class="screen-actions">
+                        <button
+                            id="runStep2Btn"
+                            type="button"
+                            class="btn btn-primary"
+                        >
+                            Run step 2
+                        </button>
+                    </div>
+
+                    <p id="step2Status" class="status-line" aria-live="polite">
+                        Waiting for step 1.
+                    </p>
+                </section>
+
+                <section id="screenStep3" class="screen">
+                    <div class="step-meta">Step 3 of 3</div>
+                    <h2 class="screen-title">Verify audit</h2>
+                    <p class="screen-copy">
+                        Use the txid plus the demo disclosure material returned
+                        by the API to validate the off-chain audit artifact.
+                    </p>
+
+                    <div class="mini-grid">
+                        <div class="mini-card">
+                            <p class="mini-label">Requester</p>
+                            <p id="step3Requester" class="mini-value">—</p>
                         </div>
 
-                        <div id="progressNode2" class="progress-node">
-                            <div class="progress-index">2</div>
-                            <p class="progress-name">Inspect confidentiality</p>
-                            <p class="progress-copy">
-                                Fetch the linked Liquid tx and confirm that
-                                outputs are blinded.
-                            </p>
-                        </div>
-
-                        <div id="progressNode3" class="progress-node">
-                            <div class="progress-index">3</div>
-                            <p class="progress-name">Run regulator audit</p>
-                            <p class="progress-copy">
-                                Use txid + blinding key to simulate a
-                                case-specific disclosure match.
-                            </p>
+                        <div class="mini-card">
+                            <p class="mini-label">Demo disclosure key</p>
+                            <p id="step3Key" class="mini-value mono">—</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="demo-layout">
-                    <div class="step-stack">
-                        <article id="demoStep1Card" class="step-panel current">
-                            <div class="step-head">
-                                <div>
-                                    <p class="eyebrow">Step 1</p>
-                                    <h3 class="step-title">
-                                        Create transfer and store IVMS101
-                                        off-chain
-                                    </h3>
-                                    <p class="step-copy">
-                                        The PoC stores the Travel Rule message
-                                        off-chain, creates a settlement
-                                        reference, and associates it with a real
-                                        Liquid Testnet txid.
-                                    </p>
-                                </div>
-
-                                <span
-                                    id="demoStep1Badge"
-                                    class="status-badge info"
-                                    >Current</span
-                                >
-                            </div>
-
-                            <div class="fact-grid">
-                                <div class="fact-card">
-                                    <p class="fact-label">Originator</p>
-                                    <p
-                                        id="demoOriginatorValue"
-                                        class="fact-value"
-                                    >
-                                        —
-                                    </p>
-                                </div>
-
-                                <div class="fact-card">
-                                    <p class="fact-label">Beneficiary</p>
-                                    <p
-                                        id="demoBeneficiaryValue"
-                                        class="fact-value"
-                                    >
-                                        —
-                                    </p>
-                                </div>
-
-                                <div class="fact-card">
-                                    <p class="fact-label">Amount</p>
-                                    <p id="demoAmountValue" class="fact-value">
-                                        —
-                                    </p>
-                                </div>
-
-                                <div class="fact-card">
-                                    <p class="fact-label">Asset</p>
-                                    <p id="demoAssetValue" class="fact-value">
-                                        —
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="callout presenter-hide">
-                                <p class="callout-title">Suggested narration</p>
-                                <p class="callout-copy">
-                                    “The Travel Rule payload is not written to
-                                    Liquid. It stays off-chain between VASPs,
-                                    while the settlement is anchored to a real
-                                    confidential transaction reference on Liquid
-                                    Testnet.”
-                                </p>
-                            </div>
-
-                            <div class="inline-actions">
-                                <button
-                                    id="demoRunTransferBtn"
-                                    type="button"
-                                    class="button primary"
-                                >
-                                    Run step 1
-                                </button>
-                                <button
-                                    id="switchToOpsBtn"
-                                    type="button"
-                                    class="button secondary presenter-hide"
-                                >
-                                    Open operations view
-                                </button>
-                            </div>
-
-                            <div id="demoTransferResult" class="result-box">
-                                No transfer executed yet.
-                            </div>
-                        </article>
-
-                        <article id="demoStep2Card" class="step-panel">
-                            <div class="step-head">
-                                <div>
-                                    <p class="eyebrow">Step 2</p>
-                                    <h3 class="step-title">
-                                        Inspect the linked Liquid transaction
-                                    </h3>
-                                    <p class="step-copy">
-                                        This stage proves that the settlement
-                                        layer is confidential. The lookup
-                                        endpoint returns blinded output evidence
-                                        from Liquid Testnet.
-                                    </p>
-                                </div>
-
-                                <span
-                                    id="demoStep2Badge"
-                                    class="status-badge neutral"
-                                    >Locked</span
-                                >
-                            </div>
-
-                            <div class="fact-grid">
-                                <div class="fact-card">
-                                    <p class="fact-label">Linked txid</p>
-                                    <p
-                                        id="demoLookupTxid"
-                                        class="fact-value mono"
-                                    >
-                                        Generated after step 1
-                                    </p>
-                                </div>
-
-                                <div class="fact-card">
-                                    <p class="fact-label">Expected proof</p>
-                                    <p class="fact-value">
-                                        Confidential outputs and blinded
-                                        commitments
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="callout presenter-hide">
-                                <p class="callout-title">Suggested narration</p>
-                                <p class="callout-copy">
-                                    “On-chain observers can inspect commitments
-                                    and confirm the transaction is confidential,
-                                    but they cannot see the clear amount or
-                                    clear asset directly from the blockchain
-                                    view.”
-                                </p>
-                            </div>
-
-                            <div class="inline-actions">
-                                <button
-                                    id="demoRunLookupBtn"
-                                    type="button"
-                                    class="button primary"
-                                >
-                                    Run step 2
-                                </button>
-                            </div>
-
-                            <div id="demoLookupResult" class="result-box">
-                                Waiting for a transfer before running the Liquid
-                                lookup.
-                            </div>
-                        </article>
-
-                        <article id="demoStep3Card" class="step-panel">
-                            <div class="step-head">
-                                <div>
-                                    <p class="eyebrow">Step 3</p>
-                                    <h3 class="step-title">
-                                        Simulate regulator disclosure
-                                    </h3>
-                                    <p class="step-copy">
-                                        This stage uses the txid plus the demo
-                                        blinding key to prove that the regulator
-                                        path can match the off-chain artifact
-                                        and the IVMS101 record.
-                                    </p>
-                                </div>
-
-                                <span
-                                    id="demoStep3Badge"
-                                    class="status-badge neutral"
-                                    >Locked</span
-                                >
-                            </div>
-
-                            <div class="fact-grid">
-                                <div class="fact-card">
-                                    <p class="fact-label">Requester</p>
-                                    <p
-                                        id="demoAuditRequester"
-                                        class="fact-value"
-                                    >
-                                        —
-                                    </p>
-                                </div>
-
-                                <div class="fact-card">
-                                    <p class="fact-label">Blinding key</p>
-                                    <p
-                                        id="demoAuditBlindingKey"
-                                        class="fact-value mono"
-                                    >
-                                        Generated after step 1
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="callout presenter-hide">
-                                <p class="callout-title">Suggested narration</p>
-                                <p class="callout-copy">
-                                    “This PoC demonstrates a case-specific
-                                    disclosure control. A valid txid plus the
-                                    matching disclosure artifact can produce a
-                                    Successful Match against the stored Travel
-                                    Rule record.”
-                                </p>
-                            </div>
-
-                            <div class="inline-actions">
-                                <button
-                                    id="demoRunAuditBtn"
-                                    type="button"
-                                    class="button primary"
-                                >
-                                    Run step 3
-                                </button>
-                            </div>
-
-                            <div id="demoAuditResult" class="result-box">
-                                Waiting for steps 1 and 2 before running the
-                                regulator audit.
-                            </div>
-                        </article>
+                    <div class="screen-actions">
+                        <button
+                            id="runStep3Btn"
+                            type="button"
+                            class="btn btn-primary"
+                        >
+                            Run step 3
+                        </button>
                     </div>
 
-                    <aside class="sidebar-stack presenter-hide">
-                        <section class="list-card">
-                            <p class="eyebrow">Architecture summary</p>
-                            <h3 class="list-title">How the PoC is split</h3>
-                            <p class="list-copy">
-                                The dual-rail model is easiest to explain when
-                                the three disclosure surfaces are shown
-                                separately.
-                            </p>
+                    <p id="step3Status" class="status-line" aria-live="polite">
+                        Waiting for step 2.
+                    </p>
+                </section>
 
-                            <ul class="bullet-list">
-                                <li>
-                                    <strong>Settlement rail</strong>
-                                    Liquid Testnet provides confidential
-                                    on-chain settlement evidence.
-                                </li>
-                                <li>
-                                    <strong>Travel Rule rail</strong>
-                                    IVMS101 is persisted off-chain and linked by
-                                    settlement reference and txid.
-                                </li>
-                                <li>
-                                    <strong>Audit rail</strong>
-                                    The demo blinding key stands in for secure
-                                    case-management disclosure material.
-                                </li>
-                            </ul>
-                        </section>
+                <section id="screenDone" class="screen">
+                    <div class="step-meta">Demo complete</div>
+                    <h2 class="screen-title">Successful end-to-end proof</h2>
+                    <p class="screen-copy">
+                        The recording can stop here: the off-chain compliance
+                        record, the linked Liquid settlement anchor, and the
+                        audit match are all visible in one final state.
+                    </p>
 
-                        <section class="list-card">
-                            <p class="eyebrow">Audience proof points</p>
-                            <h3 class="list-title">
-                                What the viewer should verify
-                            </h3>
+                    <div class="final-grid">
+                        <div class="final-card">
+                            <p class="final-label">Settlement reference</p>
+                            <p id="finalSettlement" class="final-value">—</p>
+                        </div>
 
-                            <div class="proof-list">
-                                <div class="proof-item">
-                                    <h4>Proof 1</h4>
-                                    <p id="proofTransferText">
-                                        No transfer created yet.
-                                    </p>
-                                </div>
+                        <div class="final-card">
+                            <p class="final-label">Transaction ID</p>
+                            <p id="finalTxid" class="final-value mono">—</p>
+                        </div>
 
-                                <div class="proof-item">
-                                    <h4>Proof 2</h4>
-                                    <p id="proofLookupText">
-                                        No confidentiality lookup performed yet.
-                                    </p>
-                                </div>
+                        <div class="final-card">
+                            <p class="final-label">Confidential outputs</p>
+                            <p id="finalConf" class="final-value">—</p>
+                        </div>
 
-                                <div class="proof-item">
-                                    <h4>Proof 3</h4>
-                                    <p id="proofAuditText">
-                                        No audit disclosure executed yet.
-                                    </p>
-                                </div>
-                            </div>
-                        </section>
-                    </aside>
-                </div>
-            </section>
-
-            <section id="opsView" class="view-page hidden">
-                <div class="ops-layout">
-                    <div class="form-stack">
-                        <article class="form-card">
-                            <div class="panel-header">
-                                <div>
-                                    <p class="eyebrow">Operations view</p>
-                                    <h2 class="panel-title">
-                                        Transfer builder
-                                    </h2>
-                                    <p class="panel-copy">
-                                        Use this console when you need direct
-                                        control over the payload that feeds the
-                                        PoC.
-                                    </p>
-                                </div>
-
-                                <div class="button-row">
-                                    <button
-                                        id="transferSubmitBtn"
-                                        type="button"
-                                        class="button primary"
-                                    >
-                                        Submit transfer
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="form-columns">
-                                <section class="field-grid">
-                                    <div>
-                                        <p class="eyebrow">Originator</p>
-                                        <h3
-                                            class="list-title section-title-tight"
-                                        >
-                                            Travel Rule sender party
-                                        </h3>
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label
-                                            class="field-label"
-                                            for="originatorName"
-                                            >Legal name</label
-                                        >
-                                        <input
-                                            id="originatorName"
-                                            class="field-input"
-                                            type="text"
-                                        />
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label
-                                            class="field-label"
-                                            for="originatorDocumentNumber"
-                                            >Document number</label
-                                        >
-                                        <input
-                                            id="originatorDocumentNumber"
-                                            class="field-input"
-                                            type="text"
-                                        />
-                                    </div>
-
-                                    <div class="field-row">
-                                        <div class="field-group">
-                                            <label
-                                                class="field-label"
-                                                for="originatorVaspId"
-                                                >VASP ID</label
-                                            >
-                                            <input
-                                                id="originatorVaspId"
-                                                class="field-input"
-                                                type="text"
-                                            />
-                                        </div>
-
-                                        <div class="field-group">
-                                            <label
-                                                class="field-label"
-                                                for="originatorCountry"
-                                                >Country</label
-                                            >
-                                            <input
-                                                id="originatorCountry"
-                                                class="field-input"
-                                                type="text"
-                                                maxlength="2"
-                                            />
-                                        </div>
-                                    </div>
-                                </section>
-
-                                <section class="field-grid">
-                                    <div>
-                                        <p class="eyebrow">Beneficiary</p>
-                                        <h3
-                                            class="list-title section-title-tight"
-                                        >
-                                            Receiving institution and wallet
-                                        </h3>
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label
-                                            class="field-label"
-                                            for="beneficiaryName"
-                                            >Legal name</label
-                                        >
-                                        <input
-                                            id="beneficiaryName"
-                                            class="field-input"
-                                            type="text"
-                                        />
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label
-                                            class="field-label"
-                                            for="beneficiaryWalletAddress"
-                                            >Wallet address</label
-                                        >
-                                        <input
-                                            id="beneficiaryWalletAddress"
-                                            class="field-input"
-                                            type="text"
-                                        />
-                                    </div>
-
-                                    <div class="field-row">
-                                        <div class="field-group">
-                                            <label
-                                                class="field-label"
-                                                for="beneficiaryVaspId"
-                                                >VASP ID</label
-                                            >
-                                            <input
-                                                id="beneficiaryVaspId"
-                                                class="field-input"
-                                                type="text"
-                                            />
-                                        </div>
-
-                                        <div class="field-group">
-                                            <label
-                                                class="field-label"
-                                                for="beneficiaryCountry"
-                                                >Country</label
-                                            >
-                                            <input
-                                                id="beneficiaryCountry"
-                                                class="field-input"
-                                                type="text"
-                                                maxlength="2"
-                                            />
-                                        </div>
-                                    </div>
-                                </section>
-                            </div>
-
-                            <div class="field-grid section-spaced">
-                                <div>
-                                    <p class="eyebrow">Transfer details</p>
-                                    <h3 class="list-title section-title-tight">
-                                        Settlement payload
-                                    </h3>
-                                </div>
-
-                                <div class="field-row transfer-details-row">
-                                    <div class="field-group">
-                                        <label
-                                            class="field-label"
-                                            for="transferAmount"
-                                            >Amount</label
-                                        >
-                                        <input
-                                            id="transferAmount"
-                                            class="field-input"
-                                            type="text"
-                                        />
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label
-                                            class="field-label"
-                                            for="transferCurrency"
-                                            >Fiat currency</label
-                                        >
-                                        <input
-                                            id="transferCurrency"
-                                            class="field-input"
-                                            type="text"
-                                        />
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label
-                                            class="field-label"
-                                            for="transferAssetSymbol"
-                                            >Asset symbol</label
-                                        >
-                                        <input
-                                            id="transferAssetSymbol"
-                                            class="field-input"
-                                            type="text"
-                                        />
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label
-                                            class="field-label"
-                                            for="transferPurpose"
-                                            >Purpose</label
-                                        >
-                                        <input
-                                            id="transferPurpose"
-                                            class="field-input"
-                                            type="text"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </article>
-
-                        <article class="form-card">
-                            <div class="panel-header">
-                                <div>
-                                    <p class="eyebrow">On-chain verification</p>
-                                    <h2 class="panel-title">Liquid lookup</h2>
-                                    <p class="panel-copy">
-                                        Use this form when you want direct
-                                        control over the txid being inspected.
-                                    </p>
-                                </div>
-
-                                <div class="button-row">
-                                    <button
-                                        id="useLatestLookupBtn"
-                                        type="button"
-                                        class="button secondary"
-                                    >
-                                        Use latest transfer
-                                    </button>
-                                    <button
-                                        id="lookupSubmitBtn"
-                                        type="button"
-                                        class="button primary"
-                                    >
-                                        Inspect tx
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="field-group">
-                                <label class="field-label" for="lookupTxid"
-                                    >Transaction ID</label
-                                >
-                                <textarea
-                                    id="lookupTxid"
-                                    class="field-textarea mono"
-                                ></textarea>
-                                <div class="field-help">
-                                    The demo view fills this automatically after
-                                    step 1. Here you can override it manually.
-                                </div>
-                            </div>
-                        </article>
-
-                        <article class="form-card">
-                            <div class="panel-header">
-                                <div>
-                                    <p class="eyebrow">Disclosure path</p>
-                                    <h2 class="panel-title">Regulator audit</h2>
-                                    <p class="panel-copy">
-                                        Use this form when you want to run the
-                                        audit path explicitly with controlled
-                                        inputs.
-                                    </p>
-                                </div>
-
-                                <div class="button-row">
-                                    <button
-                                        id="useLatestAuditBtn"
-                                        type="button"
-                                        class="button secondary"
-                                    >
-                                        Use latest transfer
-                                    </button>
-                                    <button
-                                        id="auditSubmitBtn"
-                                        type="button"
-                                        class="button primary"
-                                    >
-                                        Run audit
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="field-grid">
-                                <div class="field-group">
-                                    <label class="field-label" for="auditTxid"
-                                        >Transaction ID</label
-                                    >
-                                    <textarea
-                                        id="auditTxid"
-                                        class="field-textarea mono"
-                                    ></textarea>
-                                </div>
-
-                                <div class="field-group">
-                                    <label
-                                        class="field-label"
-                                        for="auditBlindingKey"
-                                        >Blinding key</label
-                                    >
-                                    <textarea
-                                        id="auditBlindingKey"
-                                        class="field-textarea mono"
-                                    ></textarea>
-                                    <div class="field-help">
-                                        Demo-only disclosure material returned
-                                        by the transfer endpoint.
-                                    </div>
-                                </div>
-
-                                <div class="field-group">
-                                    <label
-                                        class="field-label"
-                                        for="auditRequester"
-                                        >Requester</label
-                                    >
-                                    <input
-                                        id="auditRequester"
-                                        class="field-input"
-                                        type="text"
-                                    />
-                                </div>
-                            </div>
-                        </article>
+                        <div class="final-card">
+                            <p class="final-label">Audit result</p>
+                            <p id="finalAudit" class="final-value">—</p>
+                        </div>
                     </div>
 
-                    <aside class="sidebar-stack presenter-hide">
-                        <section class="list-card">
-                            <div class="panel-header panel-header-tight">
-                                <div>
-                                    <p class="eyebrow">Response inspector</p>
-                                    <h3 class="list-title">
-                                        Working payload and raw JSON
-                                    </h3>
-                                    <p id="responseHint" class="list-copy">
-                                        Select a response category to inspect
-                                        the latest backend output.
-                                    </p>
-                                </div>
-
-                                <div class="button-row">
-                                    <span
-                                        id="responseBadge"
-                                        class="status-badge neutral"
-                                        >Idle</span
-                                    >
-                                    <button
-                                        id="copyInspectorBtn"
-                                        type="button"
-                                        class="button subtle small"
-                                    >
-                                        Copy JSON
-                                    </button>
-                                </div>
+                    <div class="final-proof">
+                        <div class="final-proof-item">
+                            <div class="final-proof-number">1</div>
+                            <div>
+                                The IVMS101-style record was stored off-chain
+                                and linked to the settlement reference.
                             </div>
+                        </div>
 
-                            <div class="response-tabs">
-                                <button
-                                    type="button"
-                                    class="response-tab active"
-                                    data-response-tab="transfer"
-                                >
-                                    Transfer
-                                </button>
-                                <button
-                                    type="button"
-                                    class="response-tab"
-                                    data-response-tab="lookup"
-                                >
-                                    Lookup
-                                </button>
-                                <button
-                                    type="button"
-                                    class="response-tab"
-                                    data-response-tab="audit"
-                                >
-                                    Audit
-                                </button>
+                        <div class="final-proof-item">
+                            <div class="final-proof-number">2</div>
+                            <div>
+                                The linked Liquid transaction showed blinded
+                                outputs and confidential commitments.
                             </div>
+                        </div>
 
-                            <h4
-                                id="responseTitle"
-                                class="list-title response-title-space"
-                            >
-                                Transfer response
-                            </h4>
-
-                            <pre id="responseJson" class="json-view">
-// No response available for this section yet.</pre
-                            >
-                        </section>
-
-                        <section class="list-card">
-                            <p class="eyebrow">Operator checklist</p>
-                            <h3 class="list-title">
-                                What should be green before the demo ends
-                            </h3>
-
-                            <div class="checklist">
-                                <div class="check-item">
-                                    <div>
-                                        <p class="fact-label">
-                                            Service reachability
-                                        </p>
-                                        <p
-                                            id="checkServiceText"
-                                            class="check-copy"
-                                        >
-                                            Health check pending.
-                                        </p>
-                                    </div>
-                                    <span
-                                        id="checkServiceBadge"
-                                        class="status-badge neutral"
-                                        >Pending</span
-                                    >
-                                </div>
-
-                                <div class="check-item">
-                                    <div>
-                                        <p class="fact-label">
-                                            Transfer creation
-                                        </p>
-                                        <p
-                                            id="checkTransferText"
-                                            class="check-copy"
-                                        >
-                                            No transfer created yet.
-                                        </p>
-                                    </div>
-                                    <span
-                                        id="checkTransferBadge"
-                                        class="status-badge neutral"
-                                        >Pending</span
-                                    >
-                                </div>
-
-                                <div class="check-item">
-                                    <div>
-                                        <p class="fact-label">
-                                            Confidentiality proof
-                                        </p>
-                                        <p
-                                            id="checkLookupText"
-                                            class="check-copy"
-                                        >
-                                            No Liquid lookup performed yet.
-                                        </p>
-                                    </div>
-                                    <span
-                                        id="checkLookupBadge"
-                                        class="status-badge neutral"
-                                        >Pending</span
-                                    >
-                                </div>
-
-                                <div class="check-item">
-                                    <div>
-                                        <p class="fact-label">
-                                            Audit disclosure
-                                        </p>
-                                        <p
-                                            id="checkAuditText"
-                                            class="check-copy"
-                                        >
-                                            No audit run yet.
-                                        </p>
-                                    </div>
-                                    <span
-                                        id="checkAuditBadge"
-                                        class="status-badge neutral"
-                                        >Pending</span
-                                    >
-                                </div>
+                        <div class="final-proof-item">
+                            <div class="final-proof-number">3</div>
+                            <div>
+                                The audit path returned a successful match using
+                                the txid plus the demo disclosure input.
                             </div>
-                        </section>
-                    </aside>
+                        </div>
+                    </div>
+
+                    <div class="screen-actions">
+                        <button
+                            id="doneRestartBtn"
+                            type="button"
+                            class="btn btn-primary"
+                        >
+                            Run again
+                        </button>
+
+                        <button
+                            id="doneDetailsBtn"
+                            type="button"
+                            class="btn btn-secondary"
+                        >
+                            Show technical details
+                        </button>
+                    </div>
+                </section>
+            </main>
+
+            <footer id="proofbar" class="proofbar" hidden>
+                <div class="proof-item">
+                    <span>Settlement</span>
+                    <strong id="proofSettlement">—</strong>
                 </div>
-            </section>
 
-            <p class="footer-note presenter-hide">
-                No frontend build step was added. This UI now uses static CSS
-                assets and browser-native ES modules.
-            </p>
+                <div class="proof-item">
+                    <span>Txid</span>
+                    <strong id="proofTxid" class="mono">—</strong>
+                </div>
+
+                <div class="proof-item">
+                    <span>Amount</span>
+                    <strong id="proofAmount">—</strong>
+                </div>
+
+                <div class="proof-item">
+                    <span>Audit</span>
+                    <strong id="proofAudit">Pending</strong>
+                </div>
+            </footer>
         </div>
 
-        <div id="toastContainer" class="toast-container"></div>
+        <div id="drawerBackdrop" class="drawer-backdrop" hidden></div>
 
-        <script type="module" src="/app/main.js"></script>
+        <aside id="detailsDrawer" class="drawer" hidden>
+            <div class="drawer-head">
+                <div>
+                    <h2 class="drawer-title">Technical details</h2>
+                    <p class="drawer-copy">
+                        Hidden during the demo, available if you want to show
+                        raw backend evidence.
+                    </p>
+                </div>
+
+                <button id="closeDrawerBtn" type="button" class="btn btn-ghost">
+                    Close
+                </button>
+            </div>
+
+            <div class="drawer-body">
+                <div class="drawer-card">
+                    <div class="drawer-card-head">
+                        <h3>Demo payload</h3>
+                    </div>
+                    <pre id="payloadJson">// not started yet</pre>
+                </div>
+
+                <div class="drawer-card">
+                    <div class="drawer-card-head">
+                        <h3>Transfer response</h3>
+                    </div>
+                    <pre id="transferJson">// no transfer response yet</pre>
+                </div>
+
+                <div class="drawer-card">
+                    <div class="drawer-card-head">
+                        <h3>Lookup response</h3>
+                    </div>
+                    <pre id="lookupJson">// no lookup response yet</pre>
+                </div>
+
+                <div class="drawer-card">
+                    <div class="drawer-card-head">
+                        <h3>Audit response</h3>
+                    </div>
+                    <pre id="auditJson">// no audit response yet</pre>
+                </div>
+            </div>
+        </aside>
+
+        <div id="toastHost" class="toast-host"></div>
+
+        <script>
+            const DEMO_PAYLOAD = {
+                originator: {
+                    name: "ACME Brasil Ltda",
+                    documentNumber: "BR-REG-458820",
+                    vaspId: "BSOS_BR",
+                    country: "BR",
+                },
+                beneficiary: {
+                    name: "Taipei Supplier Co",
+                    walletAddress: "lq1-demo-beneficiary-wallet-001",
+                    vaspId: "TW_PARTNER_VASP",
+                    country: "TW",
+                },
+                transfer: {
+                    amount: "1250.75",
+                    currency: "USD",
+                    assetSymbol: "L-USDt",
+                    purpose: "B2B settlement",
+                },
+            };
+
+            const AUDIT_REQUESTER = "BCB_DEMO";
+
+            const state = {
+                screen: "intro",
+                busy: null,
+                drawerOpen: false,
+                payload: clone(DEMO_PAYLOAD),
+                transfer: null,
+                lookup: null,
+                audit: null,
+                health: {
+                    ok: false,
+                    checkedAt: null,
+                    message: "Checking API…",
+                    error: false,
+                },
+                status: freshStatus(),
+            };
+
+            const el = {
+                healthBadge: document.getElementById("healthBadge"),
+                refreshHealthBtn: document.getElementById("refreshHealthBtn"),
+                restartBtn: document.getElementById("restartBtn"),
+                toggleDetailsBtn: document.getElementById("toggleDetailsBtn"),
+
+                chip1: document.getElementById("chip1"),
+                chip2: document.getElementById("chip2"),
+                chip3: document.getElementById("chip3"),
+
+                screenIntro: document.getElementById("screenIntro"),
+                screenStep1: document.getElementById("screenStep1"),
+                screenStep2: document.getElementById("screenStep2"),
+                screenStep3: document.getElementById("screenStep3"),
+                screenDone: document.getElementById("screenDone"),
+
+                introStartBtn: document.getElementById("introStartBtn"),
+                runStep1Btn: document.getElementById("runStep1Btn"),
+                runStep2Btn: document.getElementById("runStep2Btn"),
+                runStep3Btn: document.getElementById("runStep3Btn"),
+                doneRestartBtn: document.getElementById("doneRestartBtn"),
+                doneDetailsBtn: document.getElementById("doneDetailsBtn"),
+
+                step1Originator: document.getElementById("step1Originator"),
+                step1Beneficiary: document.getElementById("step1Beneficiary"),
+                step1Amount: document.getElementById("step1Amount"),
+                step1Asset: document.getElementById("step1Asset"),
+                step1Status: document.getElementById("step1Status"),
+
+                step2Txid: document.getElementById("step2Txid"),
+                step2Status: document.getElementById("step2Status"),
+
+                step3Requester: document.getElementById("step3Requester"),
+                step3Key: document.getElementById("step3Key"),
+                step3Status: document.getElementById("step3Status"),
+
+                finalSettlement: document.getElementById("finalSettlement"),
+                finalTxid: document.getElementById("finalTxid"),
+                finalConf: document.getElementById("finalConf"),
+                finalAudit: document.getElementById("finalAudit"),
+
+                proofbar: document.getElementById("proofbar"),
+                proofSettlement: document.getElementById("proofSettlement"),
+                proofTxid: document.getElementById("proofTxid"),
+                proofAmount: document.getElementById("proofAmount"),
+                proofAudit: document.getElementById("proofAudit"),
+
+                drawerBackdrop: document.getElementById("drawerBackdrop"),
+                detailsDrawer: document.getElementById("detailsDrawer"),
+                closeDrawerBtn: document.getElementById("closeDrawerBtn"),
+
+                payloadJson: document.getElementById("payloadJson"),
+                transferJson: document.getElementById("transferJson"),
+                lookupJson: document.getElementById("lookupJson"),
+                auditJson: document.getElementById("auditJson"),
+
+                toastHost: document.getElementById("toastHost"),
+            };
+
+            function clone(value) {
+                return JSON.parse(JSON.stringify(value));
+            }
+
+            function freshStatus() {
+                return {
+                    step1: "Ready to create the transfer.",
+                    step2: "Waiting for step 1.",
+                    step3: "Waiting for step 2.",
+                    step1Kind: "",
+                    step2Kind: "",
+                    step3Kind: "",
+                };
+            }
+
+            function compact(value, left = 12, right = 8) {
+                if (!value) return "—";
+                if (value.length <= left + right + 1) return value;
+                return `${value.slice(0, left)}…${value.slice(-right)}`;
+            }
+
+            function pretty(value) {
+                return JSON.stringify(value, null, 2);
+            }
+
+            function currentStepNumber() {
+                if (state.screen === "intro") return 1;
+                if (state.screen === "step1") return 1;
+                if (state.screen === "step2") return 2;
+                if (state.screen === "step3") return 3;
+                return 0;
+            }
+
+            function completedSteps() {
+                let total = 0;
+                if (state.transfer) total = 1;
+                if (state.lookup) total = 2;
+                if (state.audit) total = 3;
+                return total;
+            }
+
+            function setVisibleScreen(screenId) {
+                const all = [
+                    el.screenIntro,
+                    el.screenStep1,
+                    el.screenStep2,
+                    el.screenStep3,
+                    el.screenDone,
+                ];
+
+                for (const node of all) {
+                    node.classList.remove("visible");
+                }
+
+                screenId.classList.add("visible");
+            }
+
+            function setProgressState(node, index) {
+                node.classList.remove("active", "complete");
+
+                const completed = completedSteps();
+                const active = currentStepNumber();
+
+                if (completed >= index) {
+                    node.classList.add("complete");
+                    return;
+                }
+
+                if (active === index) {
+                    node.classList.add("active");
+                }
+            }
+
+            function setStatusLine(node, text, kind = "") {
+                node.textContent = text;
+                node.classList.remove("success", "error");
+                if (kind === "success") node.classList.add("success");
+                if (kind === "error") node.classList.add("error");
+            }
+
+            function toast(message, kind = "") {
+                const item = document.createElement("div");
+                item.className = `toast ${kind}`.trim();
+                item.textContent = message;
+                el.toastHost.appendChild(item);
+
+                setTimeout(() => {
+                    item.remove();
+                }, 2800);
+            }
+
+            async function apiFetch(url, options = {}) {
+                const config = {
+                    headers: {
+                        Accept: "application/json",
+                        ...(options.headers || {}),
+                    },
+                    ...options,
+                };
+
+                if (config.body && !config.headers["Content-Type"]) {
+                    config.headers["Content-Type"] = "application/json";
+                }
+
+                const response = await fetch(url, config);
+                const raw = await response.text();
+
+                let data = null;
+                try {
+                    data = raw ? JSON.parse(raw) : null;
+                } catch {
+                    data = { raw };
+                }
+
+                if (!response.ok) {
+                    const error = new Error(
+                        data?.message ||
+                            data?.error ||
+                            `Request failed with status ${response.status}`,
+                    );
+                    error.status = response.status;
+                    error.data = data;
+                    throw error;
+                }
+
+                return data;
+            }
+
+            async function refreshHealth(showToast = false) {
+                state.busy = "health";
+                render();
+
+                try {
+                    const data = await apiFetch("/healthz");
+                    state.health = {
+                        ok: true,
+                        checkedAt: new Date(),
+                        message: "API online",
+                        error: false,
+                        raw: data,
+                    };
+
+                    if (showToast) toast("API online", "success");
+                } catch (error) {
+                    state.health = {
+                        ok: false,
+                        checkedAt: new Date(),
+                        message: error.message || "API unavailable",
+                        error: true,
+                    };
+
+                    if (showToast) toast(state.health.message, "error");
+                } finally {
+                    state.busy = null;
+                    render();
+                }
+            }
+
+            function startDemo() {
+                state.payload = clone(DEMO_PAYLOAD);
+                state.transfer = null;
+                state.lookup = null;
+                state.audit = null;
+                state.status = freshStatus();
+                state.screen = "step1";
+                render();
+                toast("Demo ready. Run step 1.");
+            }
+
+            function restartDemo() {
+                state.payload = clone(DEMO_PAYLOAD);
+                state.transfer = null;
+                state.lookup = null;
+                state.audit = null;
+                state.status = freshStatus();
+                state.screen = "intro";
+                render();
+                toast("Demo reset.");
+            }
+
+            async function runStep1() {
+                if (state.busy) return;
+
+                state.busy = "step1";
+                state.status.step1 =
+                    "Creating the off-chain record and linking the settlement anchor…";
+                state.status.step1Kind = "";
+                render();
+
+                try {
+                    const data = await apiFetch("/api/transfer", {
+                        method: "POST",
+                        body: JSON.stringify(state.payload),
+                    });
+
+                    state.transfer = data;
+                    state.status.step1 = `Done. ${data.settlement_reference} linked to ${compact(data.txid)}.`;
+                    state.status.step1Kind = "success";
+                    state.status.step2 = `Ready. Inspect ${compact(data.txid)} on Liquid Testnet.`;
+                    state.status.step2Kind = "";
+                    state.screen = "step2";
+                    toast("Step 1 complete", "success");
+                } catch (error) {
+                    state.status.step1 = error.message || "Step 1 failed.";
+                    state.status.step1Kind = "error";
+                    toast(state.status.step1, "error");
+                } finally {
+                    state.busy = null;
+                    render();
+                }
+            }
+
+            async function runStep2() {
+                if (state.busy || !state.transfer?.txid) return;
+
+                state.busy = "step2";
+                state.status.step2 =
+                    "Fetching the linked Liquid transaction and checking confidentiality…";
+                state.status.step2Kind = "";
+                render();
+
+                try {
+                    const data = await apiFetch(
+                        `/api/liquid/tx/${encodeURIComponent(state.transfer.txid)}`,
+                    );
+
+                    state.lookup = data;
+                    const count =
+                        data?.confidentiality?.blinded_output_count ?? 0;
+
+                    state.status.step2 = `Done. ${count} blinded output${count === 1 ? "" : "s"} detected.`;
+                    state.status.step2Kind = "success";
+                    state.status.step3 =
+                        "Ready. Verify the audit using the txid plus the demo disclosure key.";
+                    state.status.step3Kind = "";
+                    state.screen = "step3";
+                    toast("Step 2 complete", "success");
+                } catch (error) {
+                    state.status.step2 = error.message || "Step 2 failed.";
+                    state.status.step2Kind = "error";
+                    toast(state.status.step2, "error");
+                } finally {
+                    state.busy = null;
+                    render();
+                }
+            }
+
+            async function runStep3() {
+                if (
+                    state.busy ||
+                    !state.transfer?.txid ||
+                    !state.transfer?.regulator_demo?.blinding_key
+                ) {
+                    return;
+                }
+
+                state.busy = "step3";
+                state.status.step3 =
+                    "Validating the disclosure input against the stored audit artifact…";
+                state.status.step3Kind = "";
+                render();
+
+                try {
+                    const data = await apiFetch("/api/audit", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            txid: state.transfer.txid,
+                            blinding_key:
+                                state.transfer.regulator_demo.blinding_key,
+                            requester: AUDIT_REQUESTER,
+                        }),
+                    });
+
+                    state.audit = data;
+                    state.status.step3 = `Done. Audit returned ${data.status}.`;
+                    state.status.step3Kind = "success";
+                    state.screen = "done";
+                    toast("Step 3 complete", "success");
+                } catch (error) {
+                    state.status.step3 = error.message || "Step 3 failed.";
+                    state.status.step3Kind = "error";
+                    toast(state.status.step3, "error");
+                } finally {
+                    state.busy = null;
+                    render();
+                }
+            }
+
+            function openDrawer() {
+                state.drawerOpen = true;
+                render();
+            }
+
+            function closeDrawer() {
+                state.drawerOpen = false;
+                render();
+            }
+
+            function updateDrawer() {
+                el.payloadJson.textContent = pretty(state.payload);
+                el.transferJson.textContent = state.transfer
+                    ? pretty(state.transfer)
+                    : "// no transfer response yet";
+                el.lookupJson.textContent = state.lookup
+                    ? pretty(state.lookup)
+                    : "// no lookup response yet";
+                el.auditJson.textContent = state.audit
+                    ? pretty(state.audit)
+                    : "// no audit response yet";
+            }
+
+            function render() {
+                setProgressState(el.chip1, 1);
+                setProgressState(el.chip2, 2);
+                setProgressState(el.chip3, 3);
+
+                if (state.screen === "intro") setVisibleScreen(el.screenIntro);
+                if (state.screen === "step1") setVisibleScreen(el.screenStep1);
+                if (state.screen === "step2") setVisibleScreen(el.screenStep2);
+                if (state.screen === "step3") setVisibleScreen(el.screenStep3);
+                if (state.screen === "done") setVisibleScreen(el.screenDone);
+
+                el.step1Originator.textContent = state.payload.originator.name;
+                el.step1Beneficiary.textContent =
+                    state.payload.beneficiary.name;
+                el.step1Amount.textContent = `${state.payload.transfer.amount} ${state.payload.transfer.currency}`;
+                el.step1Asset.textContent = state.payload.transfer.assetSymbol;
+
+                const fullTxid = state.transfer?.txid || "—";
+                el.step2Txid.textContent = compact(fullTxid, 16, 12);
+                el.step2Txid.title = fullTxid;
+
+                const key = state.transfer?.regulator_demo?.blinding_key || "—";
+                el.step3Requester.textContent = AUDIT_REQUESTER;
+                el.step3Key.textContent = compact(key, 16, 12);
+                el.step3Key.title = key;
+
+                setStatusLine(
+                    el.step1Status,
+                    state.status.step1,
+                    state.status.step1Kind,
+                );
+                setStatusLine(
+                    el.step2Status,
+                    state.status.step2,
+                    state.status.step2Kind,
+                );
+                setStatusLine(
+                    el.step3Status,
+                    state.status.step3,
+                    state.status.step3Kind,
+                );
+
+                el.finalSettlement.textContent =
+                    state.transfer?.settlement_reference || "—";
+                el.finalTxid.textContent = compact(
+                    state.transfer?.txid || "—",
+                    16,
+                    12,
+                );
+                el.finalTxid.title = state.transfer?.txid || "";
+
+                const blindedCount =
+                    state.lookup?.confidentiality?.blinded_output_count;
+                el.finalConf.textContent =
+                    blindedCount === undefined
+                        ? "—"
+                        : `${blindedCount} blinded output${blindedCount === 1 ? "" : "s"}`;
+
+                el.finalAudit.textContent = state.audit?.status || "—";
+
+                const hasProof = Boolean(state.transfer);
+                el.proofbar.hidden = !hasProof;
+                el.proofSettlement.textContent =
+                    state.transfer?.settlement_reference || "—";
+                el.proofTxid.textContent = compact(state.transfer?.txid || "—");
+                el.proofTxid.title = state.transfer?.txid || "";
+                el.proofAmount.textContent = `${state.payload.transfer.amount} ${state.payload.transfer.currency} · ${state.payload.transfer.assetSymbol}`;
+                el.proofAudit.textContent = state.audit?.status || "Pending";
+
+                if (state.health.error) {
+                    el.healthBadge.className = "badge badge-error";
+                    el.healthBadge.textContent = state.health.message;
+                } else if (state.health.ok) {
+                    el.healthBadge.className = "badge badge-success";
+                    el.healthBadge.textContent = "API online";
+                } else {
+                    el.healthBadge.className = "badge badge-warning";
+                    el.healthBadge.textContent = state.health.message;
+                }
+
+                el.refreshHealthBtn.disabled = state.busy === "health";
+
+                const inProgress =
+                    state.screen !== "intro" ||
+                    state.transfer ||
+                    state.lookup ||
+                    state.audit;
+                el.restartBtn.hidden = !inProgress;
+                el.restartBtn.disabled = Boolean(state.busy);
+
+                el.introStartBtn.disabled = Boolean(state.busy);
+                el.runStep1Btn.disabled = Boolean(state.busy);
+                el.runStep2Btn.disabled =
+                    Boolean(state.busy) || !state.transfer?.txid;
+                el.runStep3Btn.disabled =
+                    Boolean(state.busy) ||
+                    !state.transfer?.txid ||
+                    !state.lookup ||
+                    !state.transfer?.regulator_demo?.blinding_key;
+                el.doneRestartBtn.disabled = Boolean(state.busy);
+                el.doneDetailsBtn.disabled = Boolean(state.busy);
+
+                el.runStep1Btn.textContent =
+                    state.busy === "step1" ? "Running…" : "Run step 1";
+                el.runStep2Btn.textContent =
+                    state.busy === "step2" ? "Running…" : "Run step 2";
+                el.runStep3Btn.textContent =
+                    state.busy === "step3" ? "Running…" : "Run step 3";
+
+                el.drawerBackdrop.hidden = !state.drawerOpen;
+                el.detailsDrawer.hidden = !state.drawerOpen;
+                el.toggleDetailsBtn.textContent = state.drawerOpen
+                    ? "Hide details"
+                    : "Technical details";
+
+                updateDrawer();
+            }
+
+            el.refreshHealthBtn.addEventListener("click", () =>
+                refreshHealth(true),
+            );
+            el.introStartBtn.addEventListener("click", startDemo);
+            el.runStep1Btn.addEventListener("click", runStep1);
+            el.runStep2Btn.addEventListener("click", runStep2);
+            el.runStep3Btn.addEventListener("click", runStep3);
+            el.restartBtn.addEventListener("click", restartDemo);
+            el.doneRestartBtn.addEventListener("click", restartDemo);
+
+            el.toggleDetailsBtn.addEventListener("click", () => {
+                if (state.drawerOpen) closeDrawer();
+                else openDrawer();
+            });
+
+            el.doneDetailsBtn.addEventListener("click", openDrawer);
+            el.closeDrawerBtn.addEventListener("click", closeDrawer);
+            el.drawerBackdrop.addEventListener("click", closeDrawer);
+
+            window.addEventListener("keydown", (event) => {
+                if (event.key === "Escape" && state.drawerOpen) {
+                    closeDrawer();
+                }
+            });
+
+            render();
+            refreshHealth(false);
+        </script>
     </body>
 </html>
